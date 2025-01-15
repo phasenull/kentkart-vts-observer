@@ -1,10 +1,8 @@
 import * as GtfsRealtimeBindings from "gtfs-realtime-bindings"
-import db from "./db"
-import { VTS } from "./schema"
 
 export default async function fetchVTS() {
-	const region = "004"
-	// const token = env.KK_PN_JWT
+	const region = process.env.KENTKART_REGION || "004"
+	console.log(`${new Date().toISOString()} - fetching VTS data for region`, region)
 	const response = await fetch(
 		`https://service.kentkart.com/api/gtfs/realtime?${new URLSearchParams({
 			region: region,
@@ -12,9 +10,8 @@ export default async function fetchVTS() {
 		}).toString()}`,
 		{
 			headers: {
-				"User-Agent": `ProjectFKart.workers.STO.apps.VTS`,
-				"Project": "FKart",
-				"Project-Url": "not_available",
+				"User-Agent": `kentkart-vts-observer`,
+				"git-url": "https://github.com/phasenull/kentkart-vts-observer",
 			},
 		}
 	)
@@ -31,7 +28,6 @@ export default async function fetchVTS() {
 		try {
 			json = JSON.parse(bfr_str)
 		} catch (e) {
-			// console.warn("Successfully couldn't parse as JSON")
 			json = undefined
 		}
 		if (json) {
