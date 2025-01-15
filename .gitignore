@@ -3,3 +3,4 @@ dist
 .env
 *.db
 *.old
+*.db-journal

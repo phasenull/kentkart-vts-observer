@@ -2,8 +2,7 @@
 	"compilerOptions": {
 		"rootDir": "./src",
 		"strict": true,
-		"paths": {
-		},
+		"paths": {},
 		"target": "esnext",
 		"moduleDetection": "force",
 		// "noUncheckedIndexedAccess": true,
@@ -16,7 +15,8 @@
 	},
 	"include": [
 		"src/**/*.ts",
-		"types.d.ts"
+		"types.d.ts",
+		"env.d.ts"
 	],
 	"files": [
 		"src/index.ts"

@@ -3,8 +3,8 @@
 // node-cron
 import { CRON_JOB } from "./cronjob"
 import { SERVER } from "./server"
+require("dotenv").config()
 const PORT = process.env.PORT || 8080
-
 
 import {Worker,isMainThread,parentPort, workerData} from "worker_threads"
 console.log("~STARTING A NEW NODE PROCESS - isMainThread =",isMainThread)

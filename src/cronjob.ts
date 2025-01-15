@@ -11,10 +11,10 @@ import db from "./db"
 import { Worker, isMainThread, parentPort } from "worker_threads"
 import { lt } from "drizzle-orm"
 
-
+const ENV = process.env
 export function CRON_JOB() {
 	// on every day of week at 00:00, remove old entries
-	cron.schedule("0 0 * * *", async () => {
+	cron.schedule(process.env.VTS_CLEANUP_TRIGGER || "0 0 * * *", async () => {
 		const allowed = new Date(Math.floor((Date.now() - 1000 * 60 * 60 * 24 * 14)))
 		const delete_old = await db.delete(VTS).where(lt(VTS.created_at, allowed))
 		console.log(`${new Date().toISOString()} - deleted ${delete_old.changes} old entries`)
@@ -22,7 +22,7 @@ export function CRON_JOB() {
 		console.error(error)
 	})
 	
-	cron.schedule("*/60 * * * * *", async () => {
+	cron.schedule(process.env.VTS_REFETCH_INTERVAL || "*/60 * * * * *", async () => {
 		const feed = await fetchVTS()
 		if (!feed.header.timestamp) throw new Error(`${new Date().toISOString()} - no timestamp header found`)
 		const now = ((feed.header.timestamp as any).low || feed.header.timestamp) * 1000
