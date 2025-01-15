@@ -1,0 +1,24 @@
+{
+	"compilerOptions": {
+		"rootDir": "./src",
+		"strict": true,
+		"paths": {
+		},
+		"target": "esnext",
+		"moduleDetection": "force",
+		// "noUncheckedIndexedAccess": true,
+		"module": "CommonJS",
+		"moduleResolution": "node",
+		"outDir": "./dist",
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"allowJs": true
+	},
+	"include": [
+		"src/**/*.ts",
+		"types.d.ts"
+	],
+	"files": [
+		"src/index.ts"
+	]
+}
