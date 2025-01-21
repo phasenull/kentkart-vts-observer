@@ -83,13 +83,9 @@ export function CRON_JOB() {
 		console.log(`${new Date().toISOString()} - filtered vehicles!`)
 		const vehicles_result = await db.insert(VEHICLES).values(
 			vehicles_filered
-		).onConflictDoUpdate({
-			target: [VEHICLES.license_plate],
-			set: {
-				license_plate: VEHICLES.license_plate,
-				last_seen: new Date(now),
-			}
-		})
+		).onConflictDoNothing()
+
+
 		console.log(`${new Date().toISOString()} - inserted ${vehicles_result.changes} vehicles`)
 		const vts_changes = await db.insert(VTS).values(
 			values.filter((x) => x !== undefined) as any
