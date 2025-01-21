@@ -5,6 +5,7 @@ import { Router } from "express";
 const fs = require("fs")
 const RUNTIME_STARTED_AT = new Date()
 export const SERVER = Router()
+const path = require("path");
 function getDatabaseSize() {
 	const stats = fs.statSync("VTS.db")
 	const fileSizeInBytes = stats.size
