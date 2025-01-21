@@ -98,7 +98,8 @@ console.log(`${new Date().toISOString()} - updated ${update_last_seen.changes} l
 			)
 			console.log(`${new Date().toISOString()} - inserted ${vts_changes.changes} vts entries`)
 		} catch (error) {
-			console.error(`${new Date().toISOString()} - error inserting vts entries: ${error.message}`)
+			console.log(`${new Date().toISOString()} - error inserting vts entries:`)
+console.error(error)
 		}
 	}, { runOnInit: true, timezone: "Europe/Istanbul" }).addListener("error", (error) => {
 		console.error(error)
