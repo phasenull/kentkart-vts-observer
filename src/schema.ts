@@ -2,9 +2,9 @@ import { sqliteTable, int, real, text, index, primaryKey } from "drizzle-orm/sql
 
 
 export const VTS = sqliteTable("vts", {
-	created_at: int("created_at", { mode: "timestamp" }).references(() => VTS_METADATA.created_at),
-	vehicle_license_plate: text("vehicle_license_plate", { length: 10 }).references(() => VEHICLES.license_plate),
-	vehicle_id: int("vehicle_id").references(() => VEHICLES.id),
+	created_at: int("created_at", { mode: "timestamp" }),
+	vehicle_license_plate: text("vehicle_license_plate", { length: 10 }),
+	vehicle_id: int("vehicle_id"),
 	trip_route_direction: int("direction"),
 	trip_route_id: int("trip_route_id"),
 	trip_trip_id: int("trip_trip_id"),
