@@ -18,7 +18,7 @@ export const VTS = sqliteTable("vts", {
 	timestamp: int("timestamp", { mode: "timestamp" }),
 	stop_id: int("stop_id"),
 	vehicle_label: text("vehicle_label", { length: 100 })
-)
+})
 export const VEHICLES = sqliteTable("vehicles", {
 	id: int("id").primaryKey().unique().notNull(),
 	license_plate: text("license_plate", { length: 10 }).unique().notNull(),
