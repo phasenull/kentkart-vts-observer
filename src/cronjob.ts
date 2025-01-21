@@ -92,11 +92,14 @@ const update_last_seen = await db.update(VEHICLES).set({
 			last_seen: new Date(now)
 		}).where(inArray(VEHICLES.id,vehicles_filered.map((v:any) => v.id)))
 console.log(`${new Date().toISOString()} - updated ${update_last_seen.changes} last_seen data`)
-		const vts_changes = await db.insert(VTS).values(
-			values.filter((x) => x !== undefined) as any
-		).onConflictDoNothing()
-		console.log(`${new Date().toISOString()} - inserted ${vts_changes.changes} vts entries`)
-
+		try {
+			const vts_changes = await db.insert(VTS).values(
+				values.filter((x) => x !== undefined) as any
+			)
+			console.log(`${new Date().toISOString()} - inserted ${vts_changes.changes} vts entries`)
+		} catch (error) {
+			console.error(`${new Date().toISOString()} - error inserting vts entries: ${error.message}`)
+		}
 	}, { runOnInit: true, timezone: "Europe/Istanbul" }).addListener("error", (error) => {
 		console.error(error)
 	})
