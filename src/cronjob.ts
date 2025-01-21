@@ -93,7 +93,7 @@ const update_last_seen = await db.update(VEHICLES).set({
 console.log(`${new Date().toISOString()} - updated ${update_last_seen.changes} last_seen data`)
 		const vts_changes = await db.insert(VTS).values(
 			values.filter((x) => x !== undefined) as any
-		)
+		).onConflictDoNothing()
 		console.log(`${new Date().toISOString()} - inserted ${vts_changes.changes} vts entries`)
 
 	}, { runOnInit: true, timezone: "Europe/Istanbul" }).addListener("error", (error) => {
