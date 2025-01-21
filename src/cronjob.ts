@@ -26,6 +26,7 @@ export function CRON_JOB() {
 		const feed = await fetchVTS()
 		if (!feed.header.timestamp) throw new Error(`${new Date().toISOString()} - no timestamp header found`)
 		const now = ((feed.header.timestamp as any).low || feed.header.timestamp) * 1000
+console.log(`${new Date().toISOString()} - found header.timestamp: ${new Date(now).toISOString()}`)
 		/// @ts-ignore
 		const values: typeof VTS.$inferInsert[] = feed?.entity?.map((vehicle: Vehicle) => {
 			if (!vehicle?.vehicle?.trip?.routeId) return undefined
