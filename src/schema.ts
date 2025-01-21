@@ -19,7 +19,6 @@ export const VTS = sqliteTable("vts", {
 	stop_id: int("stop_id"),
 	vehicle_label: text("vehicle_label", { length: 100 }),
 }, (table) =>
-	[primaryKey({ columns: [table.created_at, table.vehicle_id] }),
 	index("vts_custom_created_at_index").on(table.created_at),
 	index("vts_custom_vehicle_id_index").on(table.vehicle_id),
 	index("vts_custom_route_id_index").on(table.trip_route_id),
