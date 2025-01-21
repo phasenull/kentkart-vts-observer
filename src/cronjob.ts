@@ -89,8 +89,8 @@ export function CRON_JOB() {
 		console.log(`${new Date().toISOString()} - inserted ${vehicles_result.changes} vehicles`)
 const update_last_seen = await db.update(VEHICLES).set({
 			last_seen: new Date(now)
-		}).where(VEHICLES.id.in(vehicles_filtered.map(v => v.id)))
-console.log(`${new Date().toISOString()} - updated ${vts_changes.changes} last_seen data`)
+		}).where(VEHICLES.id.in(vehicles_filered.map((v:any) => v.id)))
+console.log(`${new Date().toISOString()} - updated ${update_last_seen.changes} last_seen data`)
 		const vts_changes = await db.insert(VTS).values(
 			values.filter((x) => x !== undefined) as any
 		)
