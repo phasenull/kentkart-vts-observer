@@ -33,17 +33,43 @@ export const VEHICLES = sqliteTable("vehicles", {
 	]
 )
 
-export const TRIPS = sqliteTable("trips", {
-	trip_id: int("id").primaryKey().unique().notNull(),
-	direction: int("direction").default(0),
-	route_id: int("route_id").notNull(),
-	route_label: text("label", { length: 100 }).notNull(),
-	display_route_code: text("displayRouteCode", { length: 10 }),
+
+export const AGENCIES = sqliteTable("agencies",{
+	id: int("id").primaryKey().notNull(),
 	created_at: int("created_at", { mode: "timestamp" }).notNull(),
-	departure_time_offset_minutes: int("departure_time_offset_minutes"),
-	paternColor: text("paternColor", { length: 10 }),
-	service_id: int("service_id"),
+	name: text("name", { length: 200 }).notNull(),
+	phone: text("phone", { length: 20 }),
+	email: text("email", { length: 30 }),
+	website: text("website", { length: 30 }),
+	color: text("color", { length: 10 }),
+	base64image: text("base64image", { length: 1000 }),
+	info: text("info", { length: 400 }),
+})
+
+export const TRIPS = sqliteTable("trips", {
+	trip_id: int("id").primaryKey().notNull(),
+	direction: int("direction").default(0),
+	// also is the short name for the route (A-B)
 	trip_headsign: text("trip_headsign", { length: 200 }),
+
+	// trip details for exceptional cases like different paths for specific hours
+	trip_info: text("trip_info", { length: 400 }),
+	
+	
+	// full name of the route (A-B-C-D-E)
+	route_name: text("route_name", { length: 200 }),
+	route_id: int("route_id").notNull(),
+	// visible route code (41K, 41Ç)
+	display_route_code: text("display_route_code", { length: 10 }),
+
+	agency_id: int("agency_id"),
+	
+	updated_at: int("updated_at", { mode: "timestamp" }),
+	created_at: int("created_at", { mode: "timestamp" }).notNull(),
+	departure_time: text("departure_time",{length:5}),
+	pattern_color: text("pattern_color", { length: 10 }),
+	service_id: int("service_id"),
+	is_public: int("is_public", { mode: "boolean" }),
 })
 export const VTS_METADATA = sqliteTable("vts_metadata", {
 	created_at: int("created_at", { mode: "timestamp" }).primaryKey().notNull().unique(),

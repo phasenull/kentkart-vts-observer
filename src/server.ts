@@ -1,3 +1,4 @@
+import { TripsController } from "./controllers/TripsController";
 import { VTSController } from "./controllers/VTSController";
 import { VehicleController } from "./controllers/VehicleController";
 import SwaggerController from "./swagger";
@@ -14,6 +15,7 @@ function getDatabaseSize() {
 SERVER.use("/docs",SwaggerController)
 SERVER.use("/api/vts", VTSController);
 SERVER.use("/api/vehicles", VehicleController);
+SERVER.use("/api/trips", TripsController);
 
 SERVER.get("/download", async (req, res) => {
 	const filePath = path.resolve("VTS.db");
