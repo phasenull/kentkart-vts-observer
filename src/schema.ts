@@ -17,7 +17,6 @@ export const VTS = sqliteTable("vts", {
 	current_status: int("current_status"),
 	timestamp: int("timestamp", { mode: "timestamp" }),
 	stop_id: int("stop_id"),
-	vehicle_label: text("vehicle_label", { length: 100 })
 })
 export const VEHICLES = sqliteTable("vehicles", {
 	id: int("id").primaryKey().unique().notNull(),
@@ -27,13 +26,25 @@ export const VEHICLES = sqliteTable("vehicles", {
 	bicycle: int("is_bicycle", { mode: "boolean" }),
 	accesible: int("is_accesible", { mode: "boolean" }),
 	ac: int("is_ac", { mode: "boolean" }),
-}, (table) => 
+}, (table) =>
 	[
 		index("vehicles_id_index").on(table.id),
 		index("vehicles_license_plate_index").on(table.license_plate),
 	]
 )
 
+export const TRIPS = sqliteTable("trips", {
+	trip_id: int("id").primaryKey().unique().notNull(),
+	direction: int("direction").default(0),
+	route_id: int("route_id").notNull(),
+	route_label: text("label", { length: 100 }).notNull(),
+	display_route_code: text("displayRouteCode", { length: 10 }),
+	created_at: int("created_at", { mode: "timestamp" }).notNull(),
+	departure_time_offset_minutes: int("departure_time_offset_minutes"),
+	paternColor: text("paternColor", { length: 10 }),
+	service_id: int("service_id"),
+	trip_headsign: text("trip_headsign", { length: 200 }),
+})
 export const VTS_METADATA = sqliteTable("vts_metadata", {
 	created_at: int("created_at", { mode: "timestamp" }).primaryKey().notNull().unique(),
 	vehicle_count: int("vehicle_count").notNull(),
