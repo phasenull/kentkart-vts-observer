@@ -1,8 +1,8 @@
 // create express router
 import { desc, eq } from "drizzle-orm";
-import db from "../db";
-import { TRIPS, VEHICLES, VTS } from "../schema";
 import { Router } from "express";
+import db from "../db";
+import { AGENCIES, VEHICLES, VTS } from "../schema";
 export const VehicleController = Router();
 const MAX_LIMIT = 500
 const DEFAULT_LIMIT = 100
@@ -231,7 +231,10 @@ VehicleController.get("/:id", async (req, res) => {
 		res.status(400).json({ message: "Invalid ID" });
 		return
 	}
-	const result = await db.query.VEHICLES.findFirst({ where: eq(VEHICLES.id, id) });
+	const result = await db.select(
+	).from(VEHICLES).where(eq(VEHICLES.id, id)).limit(1).leftJoin(
+		AGENCIES, eq(VEHICLES.agency_id, AGENCIES.id)
+	);
 	res.json({
 		success: true,
 		data: result || null,
@@ -330,7 +333,12 @@ VehicleController.get("/:id", async (req, res) => {
 VehicleController.get("/:id/history", async (req, res) => {
 	const id = parseInt(req.params.id);
 	const unique = req.query.unique
-	const limit = Math.max(Math.min(MAX_LIMIT, parseInt(req.query.limit as string)), DEFAULT_LIMIT) || DEFAULT_LIMIT;
+	let limit: number
+	try {
+		limit = parseInt(req.query.limit as any)
+	} catch (error) {
+		limit = DEFAULT_LIMIT
+	}
 	const page = Math.max(parseInt(req.query.page as string), 0) || 0;
 	if (isNaN(id)) {
 		res.status(400).json({
@@ -345,11 +353,10 @@ VehicleController.get("/:id/history", async (req, res) => {
 			id: VTS.vehicle_id,
 			timestamp: VTS.timestamp,
 		},
-		trip: TRIPS,
 		route: {
 			id: VTS.trip_route_id,
 			direction: VTS.trip_route_direction,
-			label: TRIPS.trip_headsign,
+			// name: VTS,
 		},
 		position: {
 			latitude: VTS.position_latitude,
@@ -365,9 +372,7 @@ VehicleController.get("/:id/history", async (req, res) => {
 	}).from(VTS)
 		.where(eq(VTS.vehicle_id, id))
 		.orderBy(desc(VTS.created_at))
-		.limit(limit).offset(page * limit).leftJoin(
-			TRIPS, eq(VTS.trip_trip_id, TRIPS.trip_id)
-		);
+		.limit(limit).offset(page * limit);
 	switch (unique) {
 		case "route": {
 			prepared.groupBy(VTS.trip_route_id);
