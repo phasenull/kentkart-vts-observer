@@ -333,7 +333,6 @@ VehicleController.get("/:id", async (req, res) => {
 VehicleController.get("/:id/history", async (req, res) => {
 	const id = parseInt(req.params.id);
 	const unique = req.query.unique
-	limit = Math.max(0,Math.min(limit,MAX_LIMIT))
 	const page = Math.max(parseInt(req.query.page as string), 0) || 0
 const limit = Math.min(MAX_LIMIT,Math.max(parseInt(req.query.limit as string), 0)) || DEFAULT_LIMIT;
 	if (isNaN(id)) {
