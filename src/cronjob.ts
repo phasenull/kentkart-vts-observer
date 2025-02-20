@@ -21,7 +21,10 @@ export function CRON_JOB() {
 	}, { timezone: "Europe/Istanbul", name: "delete_old_entries",runOnInit:true }).addListener("error", (error) => {
 		console.error(error)
 	})
-	
+	function formatNumber(num:number=0, commas:number=1) {
+		return Math.floor(num*(10**commas))/(10**commas)
+
+	}
 	cron.schedule(process.env.VTS_REFETCH_INTERVAL || "*/60 * * * * *", async () => {
 		const feed = await fetchVTS()
 		if (!feed.header.timestamp) throw new Error(`${new Date().toISOString()} - no timestamp header found`)
@@ -39,10 +42,10 @@ export function CRON_JOB() {
 				trip_trip_id: parseInt((vehicle.vehicle?.trip?.tripId) || "0"),
 				trip_schedule_relationship: vehicle.vehicle?.trip?.scheduleRelationship,
 				trip_route_id: parseInt(route_id),
-				position_latitude: vehicle.vehicle?.position?.latitude,
-				position_longitude: vehicle.vehicle?.position?.longitude,
-				position_bearing: vehicle.vehicle?.position?.bearing,
-				position_speed: vehicle.vehicle?.position?.speed,
+				position_latitude: formatNumber(vehicle.vehicle?.position?.latitude,6),
+				position_longitude: formatNumber(vehicle.vehicle?.position?.longitude,6),
+				position_bearing: formatNumber(vehicle.vehicle?.position?.bearing,1),
+				position_speed: formatNumber(vehicle.vehicle?.position?.speed,2),
 				current_stop_sequence: vehicle.vehicle?.currentStopSequence,
 				current_status: vehicle.vehicle?.currentStatus,
 				timestamp: new Date((
