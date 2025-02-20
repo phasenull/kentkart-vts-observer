@@ -9,7 +9,7 @@ import db from "./db"
 
 
 import { Worker, isMainThread, parentPort } from "worker_threads"
-import { lt } from "drizzle-orm"
+import { lt, inArray } from "drizzle-orm"
 
 const ENV = process.env
 export function CRON_JOB() {
@@ -29,6 +29,7 @@ export function CRON_JOB() {
 		const feed = await fetchVTS()
 		if (!feed.header.timestamp) throw new Error(`${new Date().toISOString()} - no timestamp header found`)
 		const now = ((feed.header.timestamp as any).low || feed.header.timestamp) * 1000
+console.log(`${new Date().toISOString()} - found header.timestamp: ${new Date(now).toISOString()}`)
 		/// @ts-ignore
 		const values: typeof VTS.$inferInsert[] = feed?.entity?.map((vehicle: Vehicle) => {
 			if (!vehicle?.vehicle?.trip?.routeId) return undefined
@@ -86,19 +87,23 @@ export function CRON_JOB() {
 		console.log(`${new Date().toISOString()} - filtered vehicles!`)
 		const vehicles_result = await db.insert(VEHICLES).values(
 			vehicles_filered
-		).onConflictDoUpdate({
-			target: [VEHICLES.license_plate],
-			set: {
-				license_plate: VEHICLES.license_plate,
-				last_seen: new Date(now),
-			}
-		})
-		console.log(`${new Date().toISOString()} - inserted ${vehicles_result.changes} vehicles`)
-		const vts_changes = await db.insert(VTS).values(
-			values.filter((x) => x !== undefined) as any
-		)
-		console.log(`${new Date().toISOString()} - inserted ${vts_changes.changes} vts entries`)
+		).onConflictDoNothing()
 
+
+		console.log(`${new Date().toISOString()} - inserted ${vehicles_result.changes} vehicles`)
+const update_last_seen = await db.update(VEHICLES).set({
+			last_seen: new Date(now)
+		}).where(inArray(VEHICLES.id,vehicles_filered.map((v:any) => v.id)))
+console.log(`${new Date().toISOString()} - updated ${update_last_seen.changes} last_seen data`)
+		try {
+			const vts_changes = await db.insert(VTS).values(
+				values.filter((x) => x !== undefined) as any
+			)
+			console.log(`${new Date().toISOString()} - inserted ${vts_changes.changes} vts entries`)
+		} catch (error) {
+			console.log(`${new Date().toISOString()} - error inserting vts entries:`)
+console.error(error)
+		}
 	}, { runOnInit: true, timezone: "Europe/Istanbul" }).addListener("error", (error) => {
 		console.error(error)
 	})

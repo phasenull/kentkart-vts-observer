@@ -5,6 +5,7 @@ import { Router } from "express";
 const fs = require("fs")
 const RUNTIME_STARTED_AT = new Date()
 export const SERVER = Router()
+const path = require("path");
 function getDatabaseSize() {
 	const stats = fs.statSync("VTS.db")
 	const fileSizeInBytes = stats.size
@@ -13,6 +14,19 @@ function getDatabaseSize() {
 SERVER.use("/docs",SwaggerController)
 SERVER.use("/api/vts", VTSController);
 SERVER.use("/api/vehicles", VehicleController);
+
+SERVER.get("/download", async (req, res) => {
+	const filePath = path.resolve("VTS.db");
+	const utcDate = new Date().toISOString();
+	const downloadFileName = `VTS-${utcDate}.db`;
+	res.download(filePath, downloadFileName, (err) => {
+		if (err) {
+			console.error("Error downloading the file:", err);
+			res.status(500).send("Error downloading the file.");
+		}
+	});
+});
+
 SERVER.get("/", async (req, res) => {
 	res.json({
 		status: "OK",

@@ -2,9 +2,9 @@ import { sqliteTable, int, real, text, index, primaryKey } from "drizzle-orm/sql
 
 
 export const VTS = sqliteTable("vts", {
-	created_at: int("created_at", { mode: "timestamp" }).references(() => VTS_METADATA.created_at),
-	vehicle_license_plate: text("vehicle_license_plate", { length: 10 }).references(() => VEHICLES.license_plate),
-	vehicle_id: int("vehicle_id").references(() => VEHICLES.id),
+	created_at: int("created_at", { mode: "timestamp" }),
+	vehicle_license_plate: text("vehicle_license_plate", { length: 10 }),
+	vehicle_id: int("vehicle_id"),
 	trip_route_direction: int("direction"),
 	trip_route_id: int("trip_route_id"),
 	trip_trip_id: int("trip_trip_id"),
@@ -17,14 +17,8 @@ export const VTS = sqliteTable("vts", {
 	current_status: int("current_status"),
 	timestamp: int("timestamp", { mode: "timestamp" }),
 	stop_id: int("stop_id"),
-	vehicle_label: text("vehicle_label", { length: 100 }),
-}, (table) =>
-	[primaryKey({ columns: [table.created_at, table.vehicle_id] }),
-	index("vts_created_at_index").on(table.created_at),
-	index("vts_vehicle_id_index").on(table.vehicle_id),
-	index("vts_route_id_index").on(table.trip_route_id),
-	]
-)
+	vehicle_label: text("vehicle_label", { length: 100 })
+})
 export const VEHICLES = sqliteTable("vehicles", {
 	id: int("id").primaryKey().unique().notNull(),
 	license_plate: text("license_plate", { length: 10 }).unique().notNull(),
