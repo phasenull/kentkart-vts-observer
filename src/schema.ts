@@ -17,7 +17,13 @@ export const VTS = sqliteTable("vts", {
 	current_status: int("current_status"),
 	timestamp: int("timestamp", { mode: "timestamp" }),
 	stop_id: int("stop_id"),
-})
+},
+	(table) =>
+		[
+			index("vts_vehicle_id_index").on(table.vehicle_id),
+		]
+)
+
 export const VEHICLES = sqliteTable("vehicles", {
 	id: int("id").primaryKey().unique().notNull(),
 	license_plate: text("license_plate", { length: 10 }).unique().notNull(),
@@ -26,6 +32,7 @@ export const VEHICLES = sqliteTable("vehicles", {
 	bicycle: int("is_bicycle", { mode: "boolean" }),
 	accesible: int("is_accesible", { mode: "boolean" }),
 	ac: int("is_ac", { mode: "boolean" }),
+	agency_id: int("agency_id"),
 }, (table) =>
 	[
 		index("vehicles_id_index").on(table.id),
@@ -34,7 +41,7 @@ export const VEHICLES = sqliteTable("vehicles", {
 )
 
 
-export const AGENCIES = sqliteTable("agencies",{
+export const AGENCIES = sqliteTable("agencies", {
 	id: int("id").primaryKey().notNull(),
 	created_at: int("created_at", { mode: "timestamp" }).notNull(),
 	name: text("name", { length: 200 }).notNull(),
@@ -54,8 +61,8 @@ export const TRIPS = sqliteTable("trips", {
 
 	// trip details for exceptional cases like different paths for specific hours
 	trip_info: text("trip_info", { length: 400 }),
-	
-	
+
+
 	// full name of the route (A-B-C-D-E)
 	route_name: text("route_name", { length: 200 }),
 	route_id: int("route_id").notNull(),
@@ -63,10 +70,10 @@ export const TRIPS = sqliteTable("trips", {
 	display_route_code: text("display_route_code", { length: 10 }),
 
 	agency_id: int("agency_id"),
-	
+
 	updated_at: int("updated_at", { mode: "timestamp" }),
 	created_at: int("created_at", { mode: "timestamp" }).notNull(),
-	departure_time: text("departure_time",{length:5}),
+	departure_time: text("departure_time", { length: 5 }),
 	pattern_color: text("pattern_color", { length: 10 }),
 	service_id: int("service_id"),
 	is_public: int("is_public", { mode: "boolean" }),
