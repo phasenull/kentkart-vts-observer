@@ -13,12 +13,11 @@ import { lt, inArray } from "drizzle-orm"
 
 const ENV = process.env
 export function CRON_JOB() {
-	// on every day of week at 00:00, remove old entries
-	cron.schedule(process.env.VTS_CLEANUP_TRIGGER || "0 0 * * *", async () => {
+	cron.schedule(process.env.VTS_CLEANUP_TRIGGER || "0 0 1 * *", async () => {
 		const allowed = new Date(Math.floor((Date.now() - 1000 * 60 * 60 * 24 * 14)))
 		const delete_old = await db.delete(VTS).where(lt(VTS.created_at, allowed))
 		console.log(`${new Date().toISOString()} - deleted ${delete_old.changes} old entries`)
-	}, { timezone: "Europe/Istanbul", name: "delete_old_entries",runOnInit:true }).addListener("error", (error) => {
+	}, { timezone: "Europe/Istanbul", name: "delete_old_entries",runOnInit:false }).addListener("error", (error) => {
 		console.error(error)
 	})
 	function formatNumber(num:number=0, commas:number=1) {
@@ -56,7 +55,6 @@ console.log(`${new Date().toISOString()} - found header.timestamp: ${new Date(no
 				) * 1000 || 0),
 				stop_id: parseInt(vehicle.vehicle?.stopId),
 				vehicle_id: parseInt(vehicle_id),
-				vehicle_label: vehicle.vehicle?.vehicle?.label,
 				trip_route_direction: parseInt(direction),
 			}
 
