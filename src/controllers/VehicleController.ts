@@ -350,7 +350,7 @@ VehicleController.get("/:id/history", async (req, res) => {
 		route: {
 			id: VTS.trip_route_id,
 			direction: VTS.trip_route_direction,
-			label: VTS.vehicle_label,
+			// label: VTS.vehicle_label,
 		},
 		position: {
 			latitude: VTS.position_latitude,
