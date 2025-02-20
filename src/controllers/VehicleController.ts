@@ -1,7 +1,7 @@
 // create express router
 import { desc, eq } from "drizzle-orm";
 import db from "../db";
-import { VEHICLES, VTS } from "../schema";
+import { TRIPS, VEHICLES, VTS } from "../schema";
 import { Router } from "express";
 export const VehicleController = Router();
 const MAX_LIMIT = 500
@@ -329,6 +329,7 @@ VehicleController.get("/:id", async (req, res) => {
 */
 VehicleController.get("/:id/history", async (req, res) => {
 	const id = parseInt(req.params.id);
+	const unique = req.query.unique
 	const limit = Math.max(Math.min(MAX_LIMIT, parseInt(req.query.limit as string)), DEFAULT_LIMIT) || DEFAULT_LIMIT;
 	const page = Math.max(parseInt(req.query.page as string), 0) || 0;
 	if (isNaN(id)) {
@@ -337,20 +338,18 @@ VehicleController.get("/:id/history", async (req, res) => {
 		});
 		return
 	}
-	const result = await db.select({
+	const prepared = db.select({
 		created_at: VTS.created_at,
 		vehicle: {
 			license_plate: VTS.vehicle_license_plate,
 			id: VTS.vehicle_id,
 			timestamp: VTS.timestamp,
 		},
-		trip: {
-			id: VTS.trip_trip_id,
-		},
+		trip: TRIPS,
 		route: {
 			id: VTS.trip_route_id,
 			direction: VTS.trip_route_direction,
-			// label: VTS.vehicle_label,
+			label: TRIPS.trip_headsign,
 		},
 		position: {
 			latitude: VTS.position_latitude,
@@ -363,8 +362,22 @@ VehicleController.get("/:id/history", async (req, res) => {
 			sequence: VTS.current_stop_sequence,
 		},
 		current_status: VTS.current_status,
-
-	}).from(VTS).where(eq(VTS.vehicle_id, id)).orderBy(desc(VTS.created_at)).limit(limit).offset(page * limit);
+	}).from(VTS)
+		.where(eq(VTS.vehicle_id, id))
+		.orderBy(desc(VTS.created_at))
+		.limit(limit).offset(page * limit).leftJoin(
+			TRIPS, eq(VTS.trip_trip_id, TRIPS.trip_id)
+		);
+	switch (unique) {
+		case "route": {
+			prepared.groupBy(VTS.trip_route_id);
+			break
+		} case "trip": {
+			prepared.groupBy(VTS.trip_trip_id);
+			break
+		}
+	}
+	const result = await prepared.all();
 	res.json({
 		success: true,
 		count: result.length,
