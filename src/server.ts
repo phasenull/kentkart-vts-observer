@@ -19,12 +19,18 @@ SERVER.get("/download", async (req, res) => {
 	const filePath = path.resolve("VTS.db");
 	const utcDate = new Date().toISOString();
 	const downloadFileName = `VTS-${utcDate}.db`;
-	res.download(filePath, downloadFileName, (err) => {
-		if (err) {
-			console.error("Error downloading the file:", err);
-			res.status(500).send("Error downloading the file.");
-		}
-	});
+	try {
+		res.download(filePath, downloadFileName, (err) => {
+			if (err) {
+				console.error("Error downloading the file:", err);
+				res.status(500).send("Error downloading the file.");
+			}
+		});
+
+	} catch (err){
+		console.error("Error downloading the file:", err);
+		res.status(500).send("Error downloading the file.");
+	}
 });
 
 SERVER.get("/", async (req, res) => {
