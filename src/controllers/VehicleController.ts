@@ -333,14 +333,9 @@ VehicleController.get("/:id", async (req, res) => {
 VehicleController.get("/:id/history", async (req, res) => {
 	const id = parseInt(req.params.id);
 	const unique = req.query.unique
-	let limit: number
-	try {
-		limit = parseInt(req.query.limit as any)
-	} catch (error) {
-		limit = DEFAULT_LIMIT
-	}
 	limit = Math.max(0,Math.min(limit,MAX_LIMIT))
-	const page = Math.max(parseInt(req.query.page as string), 0) || 0;
+	const page = Math.max(parseInt(req.query.page as string), 0) || 0
+const limit = Math.min(MAX_LIMIT,Math.max(parseInt(req.query.limit as string), 0)) || DEFAULT_LIMIT;
 	if (isNaN(id)) {
 		res.status(400).json({
 			error: "Invalid ID", success: false
