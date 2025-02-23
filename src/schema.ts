@@ -77,6 +77,17 @@ export const TRIPS = sqliteTable("trips", {
 	pattern_color: text("pattern_color", { length: 10 }),
 	service_id: int("service_id"),
 	is_public: int("is_public", { mode: "boolean" }),
+	branched_display_route_code: text("branched_display_route_code",{length:10}),
+	special_occasion: text("special_occasion",{mode:"json"}).$type<{
+		start_at:Date,
+		end_at:Date,
+		created_at:Date,
+		updated_at:Date,
+		label:string,
+		description?:string
+	}>(),
+	// 01-ABC-012-01-01234567
+	["~internal~use~only~~~gc~object~id"]: text("gc_object_id",{length:16})
 })
 export const VTS_METADATA = sqliteTable("vts_metadata", {
 	created_at: int("created_at", { mode: "timestamp" }).primaryKey().notNull().unique(),
