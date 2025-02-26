@@ -1,13 +1,11 @@
-// create express router
-import db from "../db";
-
-
 import { Router } from "express";
 import { VTS, VTS_METADATA } from "../schema";
-import { desc, eq } from "drizzle-orm";
+import db from "../db";
+
 export const VTSController = Router();
-const MAX_LIMIT = 500
-const DEFAULT_LIMIT = 100
+const MAX_LIMIT = 500;
+const DEFAULT_LIMIT = 100;
+
 /**
  * @swagger
  * components:
@@ -63,26 +61,62 @@ const DEFAULT_LIMIT = 100
  *                    $ref: '#/components/schemas/VTS'
  */
 VTSController.get("/list", async (req, res) => {
-	try {
-		// select unique time keys from the database
-		const page = Math.max(parseInt(req.query.page as string)) || 0;
-		const limit = Math.max(Math.min(MAX_LIMIT, parseInt(req.query.limit as string)), DEFAULT_LIMIT) || DEFAULT_LIMIT;
+  try {
+    const page = Math.max(parseInt(req.query.page as string)) || 0;
+    const limit = Math.max(Math.min(MAX_LIMIT, parseInt(req.query.limit as string)), DEFAULT_LIMIT) || DEFAULT_LIMIT;
 
-		// Define the expected type for the result
+    const result = await db
+      .selectDistinct()
+      .from(VTS_METADATA)
+      .offset(page * limit)
+      .limit(limit);
 
-		// Fetch the distinct created_at values
-		const result = await db
-			.selectDistinct()
-			.from(VTS_METADATA)
-			.offset(page * limit)
-			.limit(limit);
+    res.json({
+      success: true,
+      count: result.length,
+      data: result,
+    });
+  } catch (error) {
+    res.status(500).json({ data: [], message: "Internal Server Error" });
+  }
+});
 
-		res.json({
-			success: true,
-			count: result.length,
-			data: result,
-		});
-	} catch (error) {
-		res.status(500).json({ data: [], message: "Internal Server Error" });
-	}
-})
+/**
+ * @swagger
+ * /api/vts/count:
+ *  get:
+ *    tags:
+ *      - VTS
+ *    summary: Get counts of VTS and VTS_METADATA
+ *    responses:
+ *      200:
+ *        description: Counts of VTS and VTS_METADATA
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                success:
+ *                  type: boolean
+ *                  description: The success status of the response
+ *                vtsCount:
+ *                  type: integer
+ *                  description: The count of VTS entries
+ *                vtsMetadataCount:
+ *                  type: integer
+ *                  description: The count of VTS_METADATA entries
+ */
+VTSController.get("/count", async (req, res) => {
+  try {
+    const vtsCount = await db.count().from(VTS);
+    const vtsMetadataCount = await db.count().from(VTS_METADATA);
+
+    res.json({
+      success: true,
+      vtsCount: vtsCount[0].count,
+      vtsMetadataCount: vtsMetadataCount[0].count,
+    });
+  } catch (error) {
+    res.status(500).json({ data: [], message: "Internal Server Error" });
+  }
+});
