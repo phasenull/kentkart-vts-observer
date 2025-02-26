@@ -108,8 +108,8 @@ VTSController.get("/list", async (req, res) => {
  */
 VTSController.get("/count", async (req, res) => {
   try {
-    const vtsCount = await db.count().from(VTS);
-    const vtsMetadataCount = await db.count().from(VTS_METADATA);
+    const vtsCount = await db.$count().from(VTS);
+    const vtsMetadataCount = await db.$count().from(VTS_METADATA);
 
     res.json({
       success: true,
