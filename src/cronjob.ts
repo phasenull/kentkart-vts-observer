@@ -176,7 +176,7 @@ export function CRON_JOB() {
 		}
 	}, {
 		name: "trip_generator",
-		runOnInit: false,
+		runOnInit: true,
 		timezone: "Europe/Istanbul"
 	})
 	cron.schedule(process.env.VTS_REFETCH_INTERVAL || "*/60 * * * * *", async () => {
