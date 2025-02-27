@@ -106,17 +106,3 @@ VTSController.get("/list", async (req, res) => {
  *                  type: integer
  *                  description: The count of VTS_METADATA entries
  */
-VTSController.get("/count", async (req, res) => {
-  try {
-    const vtsCount = await db.$count().from(VTS);
-    const vtsMetadataCount = await db.$count().from(VTS_METADATA);
-
-    res.json({
-      success: true,
-      vtsCount: vtsCount[0].count,
-      vtsMetadataCount: vtsMetadataCount[0].count,
-    });
-  } catch (error) {
-    res.status(500).json({ data: [], message: "Internal Server Error" });
-  }
-});
