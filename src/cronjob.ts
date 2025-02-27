@@ -141,7 +141,7 @@ export function CRON_JOB() {
 					is_public: false
 				}).where(eq(TRIPS.route_id, trip.route_id))
 				console.log("Route not found for", trip.route_id)
-				return
+				continue
 			}
 
 			const SERVICE = process.env.KENTKART_WEB_SERVICE_URL || `https://service.kentkart.com/rl1/web/pathInfo?${new URLSearchParams(
