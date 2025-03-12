@@ -11,12 +11,16 @@ import db from "./db"
 import { Worker, isMainThread, parentPort } from "worker_threads"
 import { lt, inArray, eq, isNull } from "drizzle-orm"
 import TripHelper from "./helpers/TripHelper"
+import { getDatabaseSize } from "./server"
 const ENV = process.env
 export function CRON_JOB() {
 	cron.schedule(process.env.VTS_CLEANUP_TRIGGER || "0 0 1 * *", async () => {
-		const allowed = new Date(Math.floor((Date.now() - 1000 * 60 * 60 * 24 * 14)))
+		const initial_size = getDatabaseSize()
+		const allowed = new Date(Math.floor((Date.now() - 1000 * 60 * 60 * 24 * 30)))
 		const delete_old = await db.delete(VTS).where(lt(VTS.created_at, allowed))
-		console.log(`${new Date().toISOString()} - deleted ${delete_old.changes} old entries`)
+		await db.run("VACUUM;")
+		const new_size = getDatabaseSize()
+		console.log(`${new Date().toISOString()} - deleted ${delete_old.changes} old entries DB SIZE CHANGE : ${new_size-initial_size}`)
 	}, { timezone: "Europe/Istanbul", name: "delete_old_entries", runOnInit: false }).addListener("error", (error) => {
 		console.error(error)
 	})
