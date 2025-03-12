@@ -24,6 +24,7 @@ declare global {
 			
 			// default: https://service.kentkart.com/api
 			KENTKART_LEGACY_API_SERVICE_URL:string
+			DEV?:boolean
 		}
 	}
 }

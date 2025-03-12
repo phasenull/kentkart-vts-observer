@@ -1,3 +1,4 @@
+import { EventsController } from "./controllers/EventsController";
 import { TripsController } from "./controllers/TripsController";
 import { VTSController } from "./controllers/VTSController";
 import { VehicleController } from "./controllers/VehicleController";
@@ -16,7 +17,7 @@ SERVER.use("/docs",SwaggerController)
 SERVER.use("/api/vts", VTSController);
 SERVER.use("/api/vehicles", VehicleController);
 SERVER.use("/api/trips", TripsController);
-
+SERVER.use("/api/events",EventsController)
 SERVER.get("/download", async (req, res) => {
 	const filePath = path.resolve("VTS.db");
 	const utcDate = new Date().toISOString();

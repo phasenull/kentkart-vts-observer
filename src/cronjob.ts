@@ -10,7 +10,7 @@ import db from "./db"
 
 import { Worker, isMainThread, parentPort } from "worker_threads"
 import { lt, inArray, eq, isNull } from "drizzle-orm"
-
+import TripHelper from "./helpers/TripHelper"
 const ENV = process.env
 export function CRON_JOB() {
 	cron.schedule(process.env.VTS_CLEANUP_TRIGGER || "0 0 1 * *", async () => {
@@ -179,7 +179,7 @@ export function CRON_JOB() {
 		runOnInit: true,
 		timezone: "Europe/Istanbul"
 	})
-	cron.schedule(process.env.VTS_REFETCH_INTERVAL || "*/60 * * * * *", async () => {
+	cron.schedule(process.env.DEV ? "*/15 * * * * *" : (process.env.VTS_REFETCH_INTERVAL || "*/60 * * * * *"), async () => {
 		const feed = await fetchVTS()
 		if (!feed.header.timestamp) throw new Error(`${new Date().toISOString()} - no timestamp header found`)
 		const now = ((feed.header.timestamp as any).low || feed.header.timestamp) * 1000
@@ -241,9 +241,6 @@ export function CRON_JOB() {
 			vehicles_filered
 		).onConflictDoNothing()
 		console.log(`${new Date().toISOString()} - inserted ${vehicles_result.changes} VEHICLES`)
-
-
-
 		try {
 			const add_trips_result = await db.insert(TRIPS).values(
 				values.map((vehicle) => {
@@ -262,7 +259,6 @@ export function CRON_JOB() {
 				}).filter((x) => x !== undefined)
 			).onConflictDoNothing()
 			console.log(`${new Date().toISOString()} - inserted ${add_trips_result.changes} TRIPS`)
-
 		} catch (e) {
 			console.error("[CRONJOB] Error while adding trips", e)
 		}
@@ -280,6 +276,8 @@ export function CRON_JOB() {
 			console.log(`${new Date().toISOString()} - error inserting vts entries:`)
 			console.error(error)
 		}
+		console.log(`${new Date().toISOString()} - Requesting TripHelper`)
+		TripHelper.HandleFeedMessageAsync(feed)
 	}, { runOnInit: true, timezone: "Europe/Istanbul" }).addListener("error", (error) => {
 		console.error(error)
 	})
