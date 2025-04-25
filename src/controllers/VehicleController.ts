@@ -1,8 +1,8 @@
 // create express router
-import { desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, like } from "drizzle-orm";
 import { Router } from "express";
 import db from "../db";
-import { AGENCIES, VEHICLES, VTS } from "../schema";
+import { AGENCIES, TRIPS, VEHICLES, VTS } from "../schema";
 export const VehicleController = Router();
 const MAX_LIMIT = 500
 const DEFAULT_LIMIT = 100
@@ -102,6 +102,32 @@ VehicleController.get("/list", async (req, res) => {
 	}
 })
 
+
+VehicleController.get("/search/:plate", async (req, res) => {
+	try {
+		// select unique time keys from the database
+
+		// Define the expected type for the result
+
+		// Fetch the distinct created_at values
+		const page = Math.max(parseInt(req.query.page as string), 0) || 0;
+		const result = await db.select()
+			.from(VEHICLES)
+			.where(like(VEHICLES.license_plate,(req.params.plate||"41 ")+"%"))
+			.leftJoin(VTS, and(eq(VTS.vehicle_id, VEHICLES.id), eq(VTS.created_at, VEHICLES.last_seen)))
+			.leftJoin(TRIPS, eq(VTS.trip_trip_id, TRIPS.trip_id))
+			.offset(page * 5)
+			.limit(5);
+		res.json({
+			success: true,
+			count: result.length,
+			data: result,
+		});
+	} catch (error) {
+		console.error(error)
+		res.status(500).json({ data: [], message: "Internal Server Error" });
+	}
+})
 
 /**
  * @swagger
@@ -334,7 +360,7 @@ VehicleController.get("/:id/history", async (req, res) => {
 	const id = parseInt(req.params.id);
 	const unique = req.query.unique
 	const page = Math.max(parseInt(req.query.page as string), 0) || 0
-const limit = Math.min(MAX_LIMIT,Math.max(parseInt(req.query.limit as string), 0)) || DEFAULT_LIMIT;
+	const limit = Math.min(MAX_LIMIT, Math.max(parseInt(req.query.limit as string), 0)) || DEFAULT_LIMIT;
 	if (isNaN(id)) {
 		res.status(400).json({
 			error: "Invalid ID", success: false
