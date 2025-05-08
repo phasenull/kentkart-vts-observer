@@ -91,8 +91,8 @@ SERVER.get("/dash", async (req, res) => {
         const totalTrips = tripCount.data ?? tripCount.data ?? "-";
         const dbSize = dbSizeResp?.database?.size_human ?? "-";
         const latestBuses = Array.isArray(latestBusesResp.data)
-            ? latestBusesResp.data.slice(0,5)
-            : latestBusesResp.data.slice(0,5) ?? [];
+            ? latestBusesResp.data.slice(0,15)
+            : latestBusesResp.data.slice(0,15) ?? [];
 
         // Uptime calculation
         const uptimeMs = new Date().getTime() - RUNTIME_STARTED_AT.getTime();
@@ -121,7 +121,7 @@ SERVER.get("/dash", async (req, res) => {
                 <li>Total Uptime: ${uptimeFmt}</li>
                 <li>Booted at: ${RUNTIME_STARTED_AT}</li>
             </ul>
-            <h2>Last 5 Added Buses</h2>
+            <h2>Last 15 Added Buses</h2>
 <table border="1">
   <thead>
     <tr>
@@ -137,7 +137,7 @@ SERVER.get("/dash", async (req, res) => {
   </thead>
   <tbody>
     ${latestBuses.map((bus: any) => `
-      <tr>
+      <tr href='/api/vehicles/${bus.id}/history?limit=1'>
         <td>${bus.id}</td>
         <td>${bus.license_plate}</td>
         <td>${bus.created_at}</td>
