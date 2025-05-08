@@ -74,8 +74,8 @@ SERVER.get("/dash", async (req, res) => {
         // Parallel requests
         const [
             vehicleCount,
-            tripsCount,
-            eventsCount,
+            tripCount,
+            eventCount,
             dbSizeResp,
             latestBusesResp
         ] = await Promise.all([
@@ -88,7 +88,7 @@ SERVER.get("/dash", async (req, res) => {
         // Extract data
         const totalVehicles = vehicleCount.data ?? vehicleCount.data ?? "-";
         const totalEvents = eventCount.data ?? eventCount.data ?? "-";
-        const totalTrips = tripsCount.data ?? tripsCount.data ?? "-";
+        const totalTrips = tripCount.data ?? tripCount.data ?? "-";
         const dbSize = dbSizeResp?.database?.size_human ?? "-";
         const latestBuses = Array.isArray(latestBusesResp.data)
             ? latestBusesResp.data.slice(0,5)
