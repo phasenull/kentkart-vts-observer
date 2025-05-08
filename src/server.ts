@@ -122,12 +122,34 @@ SERVER.get("/dash", async (req, res) => {
                 <li>Booted at: ${RUNTIME_STARTED_AT}</li>
             </ul>
             <h2>Last 5 Added Buses</h2>
-            <br/>
-            <a>
-            ${latestBuses.map((bus: any) =>
-                `• ${JSON.stringify(bus,undefined,2)}`
-            ).join('<br/>')}
-            </a>
+<table border="1">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>License Plate</th>
+      <th>Created At</th>
+      <th>Last Seen</th>
+      <th>Bicycle</th>
+      <th>Accessible</th>
+      <th>A/C</th>
+      <th>Agency ID</th>
+    </tr>
+  </thead>
+  <tbody>
+    ${latestBuses.map((bus: any) => `
+      <tr>
+        <td>${bus.id}</td>
+        <td>${bus.license_plate}</td>
+        <td>${bus.created_at}</td>
+        <td>${bus.last_seen}</td>
+        <td>${bus.bicycle ?? ''}</td>
+        <td>${bus.accesible ?? ''}</td>
+        <td>${bus.ac ?? ''}</td>
+        <td>${bus.agency_id ?? ''}</td>
+      </tr>
+    `).join('')}
+  </tbody>
+</table>
             </body>
             </html>
         `;
