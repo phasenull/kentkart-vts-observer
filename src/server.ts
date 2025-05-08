@@ -119,11 +119,12 @@ SERVER.get("/dash", async (req, res) => {
                 <li>Booted at: ${RUNTIME_STARTED_AT}</li>
             </ul>
             <h2>Last 5 Added Buses</h2>
-            <ol>
+            <br/>
+            <a>
             ${latestBuses.map((bus: any) =>
-                `${JSON.stringify(bus,undefined,2)}`
-            ).join('\n\n')}
-            </ol>
+                `• ${JSON.stringify(bus,undefined,2)}`
+            ).join('<br/>')}
+            </a>
             </body>
             </html>
         `;
