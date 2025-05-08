@@ -88,9 +88,9 @@ SERVER.get("/dash", async (req, res) => {
         const totalVehicles = vehicleCount.data ?? vehicleCount.data ?? "-";
         const totalEvents = eventCount.data ?? eventCount.data ?? "-";
         const dbSize = dbSizeResp?.database?.size_human ?? "-";
-        const latestBuses = Array.isArray(latestBusesResp)
-            ? latestBusesResp
-            : latestBusesResp.vehicles ?? [];
+        const latestBuses = Array.isArray(latestBusesResp.data)
+            ? latestBusesResp.data
+            : latestBusesResp.data ?? [];
 
         // Uptime calculation
         const uptimeMs = new Date().getTime() - RUNTIME_STARTED_AT.getTime();
@@ -116,6 +116,7 @@ SERVER.get("/dash", async (req, res) => {
                 <li>Total Event Count: ${totalEvents}</li>
                 <li>Database Size: ${dbSize}</li>
                 <li>Total Uptime: ${uptimeFmt}</li>
+                <li>Booted at: ${RUNTIME_STARTED_AT}</li>
             </ul>
             <h2>Last 5 Added Buses</h2>
             <ol>
