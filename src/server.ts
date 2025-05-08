@@ -60,3 +60,77 @@ SERVER.get("/", async (req, res) => {
 		}
 	});
 })
+
+// github copilot slop
+SERVER.get("/dash", async (req, res) => {
+    try {
+        // Helper to fetch and parse JSON
+        const fetchJSON = async (url: string) => {
+            const resp = await fetch(url);
+            if (!resp.ok) throw new Error(`Failed to fetch ${url}`);
+            return resp.json();
+        };
+
+        // Parallel requests
+        const [
+            vehicleCount,
+            eventCount,
+            dbSizeResp,
+            latestBusesResp
+        ] = await Promise.all([
+            fetchJSON("http://localhost:8080/api/vehicles/count"),
+            fetchJSON("http://localhost:8080/api/events/count"),
+            fetchJSON("http://localhost:8080/"),
+            fetchJSON("http://localhost:8080/api/vehicles/latest?limit=5")
+        ]);
+
+        // Extract data
+        const totalVehicles = vehicleCount.count ?? vehicleCount.total ?? "-";
+        const totalEvents = eventCount.count ?? eventCount.total ?? "-";
+        const dbSize = dbSizeResp?.database?.size_human ?? "-";
+        const latestBuses = Array.isArray(latestBusesResp)
+            ? latestBusesResp
+            : latestBusesResp.vehicles ?? [];
+
+        // Uptime calculation
+        const uptimeMs = new Date().getTime() - RUNTIME_STARTED_AT.getTime();
+        let seconds = Math.floor(uptimeMs / 1000);
+        const months = Math.floor(seconds / (30 * 24 * 3600));
+        seconds %= (30 * 24 * 3600);
+        const days = Math.floor(seconds / (24 * 3600));
+        seconds %= (24 * 3600);
+        const hours = Math.floor(seconds / 3600);
+        seconds %= 3600;
+        const minutes = Math.floor(seconds / 60);
+        seconds %= 60;
+        const uptimeFmt = `${months}:${days}:${hours}:${minutes}:${seconds}`;
+
+        // HTML output
+        let html = `
+            <html>
+            <head><title>VTS Dashboard</title></head>
+            <body>
+            <h1>VTS Dashboard</h1>
+            <ul>
+                <li>Total Vehicle Count: ${totalVehicles}</li>
+                <li>Total Event Count: ${totalEvents}</li>
+                <li>Database Size: ${dbSize}</li>
+                <li>Total Uptime: ${uptimeFmt} (month:day:hour:minute:seconds)</li>
+            </ul>
+            <h2>Last 5 Added Buses</h2>
+            <ol>
+            ${latestBuses.map((bus: any) =>
+                `<li>ID: ${bus.id ?? "-"}${bus.plate ? " | Plate: " + bus.plate : ""}</li>`
+            ).join('')}
+            </ol>
+            </body>
+            </html>
+        `;
+        res.setHeader("Content-Type", "text/html");
+        res.send(html);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Failed to fetch dashboard data.");
+    }
+});
