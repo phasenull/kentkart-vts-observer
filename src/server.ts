@@ -138,8 +138,11 @@ SERVER.get("/dash", async (req, res) => {
   <tbody>
     ${latestBuses.map((bus: any) => `
       <tr>
-<a href='/api/vehicles/${bus.id}/history?limit=1'>
-        <td>${bus.id}</td>
+
+        <td><a href='/api/vehicles/${bus.id}/history?limit=1'>
+${bus.id}
+</a>
+</td>
         <td>${bus.license_plate}</td>
         <td>${bus.created_at}</td>
         <td>${bus.last_seen}</td>
@@ -147,7 +150,7 @@ SERVER.get("/dash", async (req, res) => {
         <td>${bus.accesible ?? ''}</td>
         <td>${bus.ac ?? ''}</td>
         <td>${bus.agency_id ?? ''}</td>
-</a>
+
       </tr>
 
     `).join('')}
