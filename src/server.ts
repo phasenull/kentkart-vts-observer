@@ -139,7 +139,7 @@ SERVER.get("/dash", async (req, res) => {
     ${latestBuses.map((bus: any) => `
       <tr>
 
-        <td><a href='/api/vehicles/${bus.id}/history?limit=1'>
+        <td><a target='_blank' href='/api/vehicles/${bus.id}/history?limit=1'>
 ${bus.id}
 </a>
 </td>
