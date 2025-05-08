@@ -85,8 +85,8 @@ SERVER.get("/dash", async (req, res) => {
         ]);
 
         // Extract data
-        const totalVehicles = vehicleCount.count ?? vehicleCount.total ?? "-";
-        const totalEvents = eventCount.count ?? eventCount.total ?? "-";
+        const totalVehicles = vehicleCount.data ?? vehicleCount.data ?? "-";
+        const totalEvents = eventCount.data ?? eventCount.data ?? "-";
         const dbSize = dbSizeResp?.database?.size_human ?? "-";
         const latestBuses = Array.isArray(latestBusesResp)
             ? latestBusesResp
@@ -115,12 +115,12 @@ SERVER.get("/dash", async (req, res) => {
                 <li>Total Vehicle Count: ${totalVehicles}</li>
                 <li>Total Event Count: ${totalEvents}</li>
                 <li>Database Size: ${dbSize}</li>
-                <li>Total Uptime: ${uptimeFmt} (month:day:hour:minute:seconds)</li>
+                <li>Total Uptime: ${uptimeFmt}</li>
             </ul>
             <h2>Last 5 Added Buses</h2>
             <ol>
             ${latestBuses.map((bus: any) =>
-                `<li>ID: ${bus.id ?? "-"}${bus.plate ? " | Plate: " + bus.plate : ""}</li>`
+                `<li>ID: ${JSON.stringify(bus,undefined,2)}</li>`
             ).join('')}
             </ol>
             </body>
