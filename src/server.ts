@@ -89,8 +89,8 @@ SERVER.get("/dash", async (req, res) => {
         const totalEvents = eventCount.data ?? eventCount.data ?? "-";
         const dbSize = dbSizeResp?.database?.size_human ?? "-";
         const latestBuses = Array.isArray(latestBusesResp.data)
-            ? latestBusesResp.data
-            : latestBusesResp.data ?? [];
+            ? latestBusesResp.data.slice(0,5)
+            : latestBusesResp.data.slice(0,5) ?? [];
 
         // Uptime calculation
         const uptimeMs = new Date().getTime() - RUNTIME_STARTED_AT.getTime();
@@ -121,8 +121,8 @@ SERVER.get("/dash", async (req, res) => {
             <h2>Last 5 Added Buses</h2>
             <ol>
             ${latestBuses.map((bus: any) =>
-                `<li>ID: ${JSON.stringify(bus,undefined,2)}</li>`
-            ).join('')}
+                `${JSON.stringify(bus,undefined,2)}`
+            ).join('\n\n')}
             </ol>
             </body>
             </html>
