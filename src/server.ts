@@ -74,12 +74,13 @@ SERVER.get("/dash", async (req, res) => {
         // Parallel requests
         const [
             vehicleCount,
-            eventCount,
+            tripsCount,
+            eventsCount,
             dbSizeResp,
             latestBusesResp
         ] = await Promise.all([
             fetchJSON("http://localhost:8080/api/vehicles/count"),
-            fetchJSON("http://localhost:8080/api/events/count"),
+   fetchJSON("http://localhost:8080/api/trips/count"),         fetchJSON("http://localhost:8080/api/events/count"),
             fetchJSON("http://localhost:8080/"),
             fetchJSON("http://localhost:8080/api/vehicles/latest?limit=5")
         ]);
@@ -87,6 +88,7 @@ SERVER.get("/dash", async (req, res) => {
         // Extract data
         const totalVehicles = vehicleCount.data ?? vehicleCount.data ?? "-";
         const totalEvents = eventCount.data ?? eventCount.data ?? "-";
+        const totalTrips = tripsCount.data ?? tripsCount.data ?? "-";
         const dbSize = dbSizeResp?.database?.size_human ?? "-";
         const latestBuses = Array.isArray(latestBusesResp.data)
             ? latestBusesResp.data.slice(0,5)
@@ -113,6 +115,7 @@ SERVER.get("/dash", async (req, res) => {
             <h1>VTS Dashboard</h1>
             <ul>
                 <li>Total Vehicle Count: ${totalVehicles}</li>
+                <li>Total Trips Count: ${totalTrips}</li>
                 <li>Total Event Count: ${totalEvents}</li>
                 <li>Database Size: ${dbSize}</li>
                 <li>Total Uptime: ${uptimeFmt}</li>
