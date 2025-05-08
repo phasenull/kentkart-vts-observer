@@ -147,8 +147,9 @@ SERVER.get("/dash", async (req, res) => {
         <td>${bus.accesible ?? ''}</td>
         <td>${bus.ac ?? ''}</td>
         <td>${bus.agency_id ?? ''}</td>
-      </tr>
 </a>
+      </tr>
+
     `).join('')}
   </tbody>
 </table>
