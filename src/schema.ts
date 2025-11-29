@@ -33,7 +33,7 @@ export const VTS = sqliteTable(
 		index("vts_trip_trip_id_index").on(table.vehicle_id,table.trip_route_id,table.trip_route_direction,table.created_at),
 		index("vts_trip_route_id_index").on(table.trip_route_id,table.trip_route_direction,table.created_at),
 		index("vts_created_at_index").on(table.created_at),
-		
+
 	]
 );
 
@@ -149,6 +149,10 @@ export const VEHICLE_EVENTS = sqliteTable(
 			table.route_code,
 			table.direction,
 			table.created_at
+		),
+		index("vehicle_events_created_at").on(
+			table.created_at,
+			table.vehicle_id
 		),
 		index("vehicle_events_vehicle_id_index").on(
 			table.route_code,
