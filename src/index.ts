@@ -89,9 +89,6 @@ async function main() {
 			tg.broadcast(
 				"⚠️ Fallback mode activated. Fetching data from RL1 source. Data accuracy may be affected."
 			);
-			setTimeout(() => {
-				GLOBAL_EVENTS.emit("fallback_triggered", { is_fallback: false });
-			}, 15 * 60 * 1000);
 		});
 		const [data,err] = await KentKartHelper.getAccessTokenFromRefreshToken(
 			process.env.KENTKART_RL1_REFRESH_TOKEN || ""
