@@ -35,6 +35,21 @@ interface IMessageUpdate {
 export class TelegramHelper {
 	private readonly API_URL = "https://api.telegram.org/bot";
 	public readonly EVENTS = new EventEmitter<{ on_message: [IMessageUpdate] }>();
+	public broadcast(message:string) {
+		const all_subscribers = db.select().from(SUBSCRIBERS).all();
+		all_subscribers.forEach(async (subscriber) => {
+			const [data, err] = await this.sendMessage(
+				subscriber.chat_id,
+				message
+			);
+			if (err) {
+				console.error(
+					`Failed to send broadcast message to ${subscriber.username} (${subscriber.chat_id}):`,
+					err
+				);
+			}
+		});
+	}
 	constructor(private bot_token: string) {
 		this.API_URL += bot_token;
 		this.getMe().then(([data, err]) => {

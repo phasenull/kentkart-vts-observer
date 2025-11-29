@@ -12,6 +12,7 @@ import { Worker, isMainThread, parentPort } from "worker_threads"
 import { lt, inArray, eq, isNull } from "drizzle-orm"
 import TripHelper from "./helpers/TripHelper"
 import { getDatabaseSize } from "./server"
+import { tg } from "."
 const ENV = process.env
 export function CRON_JOB() {
 	cron.schedule(process.env.VTS_CLEANUP_TRIGGER || "0 0 1 * *", async () => {
@@ -20,7 +21,8 @@ export function CRON_JOB() {
 		const delete_old = await db.delete(VTS).where(lt(VTS.created_at, allowed))
 		await db.run("VACUUM;")
 		const new_size = getDatabaseSize()
-		console.log(`${new Date().toISOString()} - deleted ${delete_old.changes} old entries DB SIZE CHANGE : ${new_size-initial_size}`)
+		const text = (`${new Date().toISOString()} - deleted ${delete_old.changes} old entries DB SIZE CHANGE : ${new_size-initial_size}`)
+		console.log(text)
 	}, { timezone: "Europe/Istanbul", name: "delete_old_entries", runOnInit: false }).addListener("error", (error) => {
 		console.error(error)
 	})
@@ -137,6 +139,7 @@ export function CRON_JOB() {
 		}
 		let i = 0
 		for (const trip of non_proccessed) {
+			continue
 			i += 1
 			console.log(`[${i}/${non_proccessed.length}] Processing trip`, trip.route_id, trip.trip_id)
 			const route_info = routeInfoFromRouteCode(trip.route_id)

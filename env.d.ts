@@ -15,13 +15,13 @@ declare global {
 			
 			// default: 004
 			KENTKART_REGION: string,
-			
+			AUTH_TYPE: string,
 			// default: https://service.kentkart.com/rl1/web
 			KENTKART_WEB_SERVICE_URL:string
 
 			// default: https://service.kentkart.com/rl1/api
 			KENTKART_RL1_API_SERVICE_URL:string
-			
+			KENTKART_RL1_API_TOKEN:string
 			// default: https://service.kentkart.com/api
 			KENTKART_LEGACY_API_SERVICE_URL:string
 			DEV?:boolean
