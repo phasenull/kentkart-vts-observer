@@ -1,8 +1,8 @@
 // create express router
-import { desc, eq } from "drizzle-orm";
-import db from "../db";
-import { VEHICLES, VTS } from "../schema";
+import { and, asc, desc, eq, like } from "drizzle-orm";
 import { Router } from "express";
+import db from "../db";
+import { AGENCIES, TRIPS, VEHICLES, VTS } from "../schema";
 export const VehicleController = Router();
 const MAX_LIMIT = 500
 const DEFAULT_LIMIT = 100
@@ -102,6 +102,32 @@ VehicleController.get("/list", async (req, res) => {
 	}
 })
 
+
+VehicleController.get("/search/:plate", async (req, res) => {
+	try {
+		// select unique time keys from the database
+
+		// Define the expected type for the result
+
+		// Fetch the distinct created_at values
+		const page = Math.max(parseInt(req.query.page as string), 0) || 0;
+		const result = await db.select()
+			.from(VEHICLES)
+			.where(like(VEHICLES.license_plate,(req.params.plate||"41 ")+"%"))
+			.leftJoin(VTS, and(eq(VTS.vehicle_id, VEHICLES.id), eq(VTS.created_at, VEHICLES.last_seen)))
+			.leftJoin(TRIPS, eq(VTS.trip_trip_id, TRIPS.trip_id))
+			.offset(page * 5)
+			.limit(5);
+		res.json({
+			success: true,
+			count: result.length,
+			data: result,
+		});
+	} catch (error) {
+		console.error(error)
+		res.status(500).json({ data: [], message: "Internal Server Error" });
+	}
+})
 
 /**
  * @swagger
@@ -231,7 +257,10 @@ VehicleController.get("/:id", async (req, res) => {
 		res.status(400).json({ message: "Invalid ID" });
 		return
 	}
-	const result = await db.query.VEHICLES.findFirst({ where: eq(VEHICLES.id, id) });
+	const result = await db.select(
+	).from(VEHICLES).where(eq(VEHICLES.id, id)).limit(1).leftJoin(
+		AGENCIES, eq(VEHICLES.agency_id, AGENCIES.id)
+	);
 	res.json({
 		success: true,
 		data: result || null,
@@ -329,28 +358,26 @@ VehicleController.get("/:id", async (req, res) => {
 */
 VehicleController.get("/:id/history", async (req, res) => {
 	const id = parseInt(req.params.id);
-	const limit = Math.max(Math.min(MAX_LIMIT, parseInt(req.query.limit as string)), DEFAULT_LIMIT) || DEFAULT_LIMIT;
-	const page = Math.max(parseInt(req.query.page as string), 0) || 0;
+	const unique = req.query.unique
+	const page = Math.max(parseInt(req.query.page as string), 0) || 0
+	const limit = Math.min(MAX_LIMIT, Math.max(parseInt(req.query.limit as string), 0)) || DEFAULT_LIMIT;
 	if (isNaN(id)) {
 		res.status(400).json({
 			error: "Invalid ID", success: false
 		});
 		return
 	}
-	const result = await db.select({
+	const prepared = db.select({
 		created_at: VTS.created_at,
 		vehicle: {
 			license_plate: VTS.vehicle_license_plate,
 			id: VTS.vehicle_id,
 			timestamp: VTS.timestamp,
 		},
-		trip: {
-			id: VTS.trip_trip_id,
-		},
 		route: {
 			id: VTS.trip_route_id,
 			direction: VTS.trip_route_direction,
-			label: VTS.vehicle_label,
+			// name: VTS,
 		},
 		position: {
 			latitude: VTS.position_latitude,
@@ -363,8 +390,20 @@ VehicleController.get("/:id/history", async (req, res) => {
 			sequence: VTS.current_stop_sequence,
 		},
 		current_status: VTS.current_status,
-
-	}).from(VTS).where(eq(VTS.vehicle_id, id)).orderBy(desc(VTS.created_at)).limit(limit).offset(page * limit);
+	}).from(VTS)
+		.where(eq(VTS.vehicle_id, id))
+		.orderBy(desc(VTS.created_at))
+		.limit(limit).offset(page * limit);
+	switch (unique) {
+		case "route": {
+			prepared.groupBy(VTS.trip_route_id);
+			break
+		} case "trip": {
+			prepared.groupBy(VTS.trip_trip_id);
+			break
+		}
+	}
+	const result = await prepared.all();
 	res.json({
 		success: true,
 		count: result.length,

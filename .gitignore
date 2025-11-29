@@ -4,3 +4,6 @@ dist
 *.db
 *.old
 *.db-journal
+Avl
+*.pdf
+*.csv
