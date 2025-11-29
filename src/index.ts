@@ -4,7 +4,7 @@
 import EventEmitter from "events";
 import { CRON_JOB } from "./cronjob";
 import { SERVER } from "./server";
-export const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8080;
 export const GLOBAL_EVENTS = new EventEmitter<{
 	fallback_triggered: [
 		| {

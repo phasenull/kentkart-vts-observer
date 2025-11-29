@@ -8,6 +8,8 @@ import { SUBSCRIBERS, VTS, VTS_METADATA } from "./schema";
 import SwaggerController from "./swagger";
 import { Router } from "express";
 import { tg } from ".";
+const PORT = process.env.PORT || 8080;
+
 const fs = require("fs");
 const RUNTIME_STARTED_AT = new Date();
 export const SERVER = Router();
