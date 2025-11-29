@@ -18,7 +18,7 @@ SERVER.use("/api/vts", VTSController);
 SERVER.use("/api/vehicles", VehicleController);
 SERVER.use("/api/trips", TripsController);
 SERVER.use("/api/events",EventsController)
-SERVER.get("/download", async (req, res) => {
+SERVER.get("/download", (req, res) => {
 	const filePath = path.resolve("VTS.db");
 	const utcDate = new Date().toISOString();
 	const downloadFileName = `VTS-${utcDate}.db`;

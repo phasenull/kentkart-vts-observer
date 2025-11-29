@@ -1,15 +1,18 @@
 import * as GtfsRealtimeBindings from "gtfs-realtime-bindings"
 
-export default async function fetchVTS() {
+export default async function fetchVTS(args?:{is_fallback: boolean,auth_token:string,auth_type:"004"}) : Promise<GtfsRealtimeBindings.transit_realtime.FeedMessage> {
+	const {auth_token,auth_type,is_fallback} = args || {}
 	const region = process.env.KENTKART_REGION || "004"
 	console.log(`${new Date().toISOString()} - fetching VTS data for region`, region)
+	const url = is_fallback ? process.env.KENTKART_RL1_API_SERVICE_URL : process.env.KENTKART_API_SERVICE_URL
 	const response = await fetch(
-		`https://service.kentkart.com/api/gtfs/realtime?${new URLSearchParams({
+		`${url}/gtfs/realtime?${new URLSearchParams({
 			region: region,
-			antiCache: `${Math.random()}`
+			antiCache: `${Math.random()}`,
 		}).toString()}`,
 		{
 			headers: {
+				"Authorization": `Bearer ${auth_token || process.env.KENTKART_API_TOKEN || ""}`,
 				"User-Agent": `kentkart-vts-observer`,
 				"git-url": "https://github.com/phasenull/kentkart-vts-observer",
 			},
