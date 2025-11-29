@@ -86,7 +86,7 @@ export class TelegramHelper {
 					username: from,
 					created_at: new Date(),
 					ip: "unknown",
-				});
+				}).onConflictDoNothing();
 				await this.sendMessage(
 					chat_id.toString(),
 					"Welcome! You have been subscribed to VTS updates."
