@@ -92,11 +92,11 @@ SERVER.get("/dash", async (req, res) => {
 		// Parallel requests
 		const [vehicleCount, tripCount, eventCount, dbSizeResp, latestBusesResp] =
 			await Promise.all([
-				fetchJSON("http://localhost:8080/api/vehicles/count"),
-				fetchJSON("http://localhost:8080/api/trips/count"),
-				fetchJSON("http://localhost:8080/api/events/count"),
-				fetchJSON("http://localhost:8080/"),
-				fetchJSON("http://localhost:8080/api/vehicles/latest?limit=5"),
+				fetchJSON(`http://localhost:${PORT}/api/vehicles/count`),
+				fetchJSON(`http://localhost:${PORT}/api/trips/count`),
+				fetchJSON(`http://localhost:${PORT}/api/events/count`),
+				fetchJSON(`http://localhost:${PORT}/`),
+				fetchJSON(`http://localhost:${PORT}/api/vehicles/latest?limit=5`),
 			]);
 
 		// Extract data
