@@ -99,6 +99,9 @@ export const VEHICLE_EVENTS = sqliteTable("vehicle_events", {
 	direction: int("direction"),
 	event_label: text("event_label").$type<"vehicle_created" | "vehicle_destroyed">().notNull()
 }, (table) => [
+	index("vehicle_events_vehicle_id_index").on(table.vehicle_id,table.created_at),
+	index("vehicle_events_vehicle_id_index").on(table.vehicle_id,table.route_code,table.direction,table.created_at),
+	index("vehicle_events_vehicle_id_index").on(table.route_code,table.direction,table.created_at),
 	// primaryKey({ columns: [table.created_at, table.vehicle_id, table.trip_id] }),
 
 ])
